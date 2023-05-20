@@ -54,7 +54,7 @@ var searchMatrix = function(matrix, target) {
             } else {
                 rowHigh = rowMid - 1;
             }
-        } while (rowHigh > rowLow)
+        } while (rowHigh >= rowLow)
         return false;
     }
 

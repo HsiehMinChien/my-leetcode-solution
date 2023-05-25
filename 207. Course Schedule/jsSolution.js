@@ -68,3 +68,50 @@ var canFinishByDFS = function(numCourses, prerequisites) {
     }
     return true;
 };
+
+/**
+ * @param {number} numCourses
+ * @param {number[][]} prerequisites
+ * @return {boolean}
+ */
+var canFinishByTopologicalSorting = function(numCourses, prerequisites) {
+    const nodeInDigree = Array(numCourses).fill(0); // 用於檢查node的關聯性
+    const preToReqMap = {}; // 紀錄 node 與其對應的 pre node 的 map
+
+    for (let i = 0 ; i < prerequisites.length ; i++) {
+        const [req, pre] = prerequisites[i];
+        if (pre in preToReqMap) {
+            preToReqMap[pre].push(req);
+        } else {
+            preToReqMap[pre] = [req];
+        }
+        nodeInDigree[req] += 1;
+    }
+
+    const stack = [];
+
+    for (let i = 0 ; i < nodeInDigree.length ; i++) {
+        if (nodeInDigree[i] === 0) { // 表示此 node 沒有前置作業需求，可當起點
+            stack.push(i);
+        }
+    }
+
+    let count = 0;
+
+    while (stack.length) {
+        const lastNode = stack.pop();
+        const preList = preToReqMap[lastNode] ?? [];
+        count += 1;
+        
+        // 提取此 node 的所有 pre node
+        for (let i = 0 ; i < preList.length ; i++) {
+            const pre = preList[i];
+            nodeInDigree[pre] -= 1; // 消除相關聯
+            if (nodeInDigree[pre] === 0) { // 當此 node 也沒任何關聯時，塞進 stack 做檢查
+                stack.push(pre);
+            }
+        }
+    }
+
+    return count === numCourses; // 如果所有 node 最後都可以消除到沒有任何關聯，表示不存在環路
+};
